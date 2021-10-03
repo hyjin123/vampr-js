@@ -35,23 +35,6 @@ class Vampire {
     return this.numberOfVampiresFromOriginal < vampire.numberOfVampiresFromOriginal
   }
 
-  /** Tree traversal methods **/
-
-  // Returns the vampire object with that name, or null if no vampire exists with that name
-  vampireWithName(name) {
-    
-  }
-
-  // Returns the total number of vampires that exist
-  get totalDescendents() {
-    
-  }
-
-  // Returns an array of all the vampires that were converted after 1980
-  get allMillennialVampires() {
-    
-  }
-
   /** Stretch **/
 
   // Returns the closest common ancestor of two vampires.
@@ -98,6 +81,7 @@ class Vampire {
     if(this.creator === vampire.creator) {
       return this.creator;
     }
+
     // if this is Ansel, vampire is Andrew, for us to meet these bases
     // cases, we need the name to be equal. or we need their creators
     // to be equal
@@ -108,16 +92,63 @@ class Vampire {
   }
   //first find cases where it would be successful right away (base case)
   // by changing the variables, work towards getting to the base case
-  // grokking algorithms 
-  // call stack,
+  // grokking algorithms
+  // call stack
+
+  // Returns the vampire object with that name, or null if no vampire exists with that name
+  vampireWithName(name) {
+    // base case
+    if (this.name === name) {
+      return this;
+    }
+    // recursive case
+    for (const child of this.offspring) {
+      let result = child.vampireWithName(name);
+      if (result === null) {
+        // if false, we didnt find a match, go to the next tree
+      } else {
+        // if true, we found a match
+        return result;
+      }
+    }
+    // null if no vampire exist with the name
+    return null;
+  }
+
+  // Returns the total number of vampires that exist
+  get totalDescendents() {
+    let totalVampire = 0;
+    for (const vampire of this.offspring) {
+      totalVampire++;
+      totalVampire += vampire.totalDescendents;
+    }
+    return totalVampire;
+  }
+
+  // Returns an array of all the vampires that were converted after 1980
+  get allMillennialVampires() {
+    // store the result in this array
+    let result = [];
+    // add to the array if converted after 1980
+    if (this.yearConverted > 1980) {
+      result.push(this);
+    }
+    // Use depth first traversal to add to the results array
+    for (const vampire of this.offspring) {
+      const vampiresConvertedAfter = vampire.allMillennialVampires;
+      result = result.concat(vampiresConvertedAfter);
+    }
+    return result;
+  }
+
 }
 
 // creating all the vampires
-const original = new Vampire("Original", 1990);
+const original = new Vampire("Original", 1970);
 
-const ansel = new Vampire("Ansel", 1995);
-const bart = new Vampire("Bart", 1994);
-const geo = new Vampire("Geo", 1994);
+const ansel = new Vampire("Ansel", 1975);
+const bart = new Vampire("Bart", 1975);
+const geo = new Vampire("Geo", 1975);
 
 const elgort = new Vampire("Elgort", 2000);
 const sarah = new Vampire("Sarah", 2001);
@@ -133,7 +164,10 @@ ansel.addOffspring(sarah);
 
 elgort.addOffspring(andrew);
 
-// console.log(ansel.closestCommonAncestor(sarah));
+console.log(andrew.closestCommonAncestor(sarah));
+// console.log(original.vampireWithName("Bart"));
+// console.log(ansel.totalDescendents);
+// console.log(original.allMillennialVampires);
 
 module.exports = Vampire;
 
